@@ -1,0 +1,755 @@
+----------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\vkasa\Desktop\f2.log
+  log type:  text
+ opened on:  24 Oct 2018, 22:06:48
+
+. *Tabulating our main variable*
+
+. 
+. tab v312
+
+  current contraceptive method |      Freq.     Percent        Cum.
+-------------------------------+-----------------------------------
+                     not using |    438,428       62.66       62.66
+                          pill |     21,623        3.09       65.75
+                           iud |      9,554        1.37       67.12
+                    injections |      1,075        0.15       67.27
+                     diaphragm |          1        0.00       67.27
+                        condom |     29,517        4.22       71.49
+          female sterilization |    165,650       23.67       95.16
+            male sterilization |      1,787        0.26       95.42
+    rhythm/periodic abstinence |     17,873        2.55       97.97
+                    withdrawal |     13,557        1.94       99.91
+  lactational amenorrhea (lam) |        448        0.06       99.98
+                 female condom |        126        0.02       99.99
+                 foam or jelly |          8        0.00       99.99
+                 standard days |         39        0.01      100.00
+-------------------------------+-----------------------------------
+                         Total |    699,686      100.00
+
+. 
+. *We change the variable such that we remove the people who've never had sex for better results.
+
+. 
+. replace v312=. if [v312==0 & v364==5]
+(164940 real changes made, 164940 to missing)
+
+. 
+. *New Variable has been created. This variable was created to remove the people who've never had sex from v312.
+
+. 
+. *Now we create a variable that simply accounts for whether people use contraceptive methods (modern or traditional) or not. It i
+> s a nominal variable
+
+. 
+. gen contra_use=.
+(699686 missing values generated)
+
+. 
+. replace contra_use=0 if [v312==0]
+(273488 real changes made)
+
+. 
+. replace contra_use=1 if [v312>=1 & v312<=18]
+(261258 real changes made)
+
+. 
+. label define i_contra_use 0 NO 1 YES
+
+. 
+. label value contra_use i_contra_use
+
+. 
+. tab contra_use
+
+ contra_use |      Freq.     Percent        Cum.
+------------+-----------------------------------
+         NO |    273,488       51.14       51.14
+        YES |    261,258       48.86      100.00
+------------+-----------------------------------
+      Total |    534,746      100.00
+
+. 
+. tab v312
+
+  current contraceptive method |      Freq.     Percent        Cum.
+-------------------------------+-----------------------------------
+                     not using |    273,488       51.14       51.14
+                          pill |     21,623        4.04       55.19
+                           iud |      9,554        1.79       56.97
+                    injections |      1,075        0.20       57.17
+                     diaphragm |          1        0.00       57.17
+                        condom |     29,517        5.52       62.69
+          female sterilization |    165,650       30.98       93.67
+            male sterilization |      1,787        0.33       94.01
+    rhythm/periodic abstinence |     17,873        3.34       97.35
+                    withdrawal |     13,557        2.54       99.88
+  lactational amenorrhea (lam) |        448        0.08       99.97
+                 female condom |        126        0.02       99.99
+                 foam or jelly |          8        0.00       99.99
+                 standard days |         39        0.01      100.00
+-------------------------------+-----------------------------------
+                         Total |    534,746      100.00
+
+. 
+. *Adding weights to the clusters*
+
+. 
+. gen wt = v005/100000
+
+. 
+. svyset v001 [pweight=wt]
+
+      pweight: wt
+          VCE: linearized
+  Single unit: missing
+     Strata 1: <one>
+         SU 1: v001
+        FPC 1: <zero>
+
+. 
+. *Question 2 : cross tabulation of main variable with other variables*
+
+. 
+. *religion
+
+. 
+. svy: tab v312 v130, col
+(running tabulate on estimation sample)
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+
+------------------------------------------------------------------------------------------------------------------------
+current   |
+contracep |
+tive      |                                                   religion                                                  
+method    |    hindu    muslim  christia      sikh  buddhist      jain    jewish  parsi/zo  no relig     other     Total
+----------+-------------------------------------------------------------------------------------------------------------
+ not usin |     .468     .5615     .5027      .283     .3407     .3896     .6974     .8138      .767     .5997     .4775
+     pill |     .032     .0755     .0289     .0231     .0312     .0142         0         0     .0311     .1608     .0381
+      iud |    .0136     .0133     .0162     .0626     .0146     .0296         0         0      .004     .0158     .0145
+ injectio |    .0015     .0032     .0015     .0015     .0024   6.8e-04         0         0         0      .002     .0017
+ diaphrag |  2.6e-06         0         0         0         0         0         0         0         0         0   2.1e-06
+   condom |    .0493      .069     .0221     .1638     .0694     .1304     .0706         0     .0029     .0269     .0533
+ female s |    .3791     .2067     .3957      .379     .5138     .3805      .232     .1862      .169     .1414     .3569
+ male ste |    .0028   6.8e-04      .002     .0063     .0063     .0129         0         0     .0064     .0017     .0026
+ rhythm/p |    .0326     .0385     .0137     .0524      .007     .0197         0         0      .016     .0399     .0331
+ withdraw |    .0199     .0306     .0166     .0278     .0141     .0225         0         0     .0034     .0117     .0212
+ lactatio |  7.8e-04   6.6e-04   4.5e-04   4.6e-04   6.2e-04         0         0         0   7.0e-05   1.6e-04   7.5e-04
+ female c |  2.7e-04   2.1e-04   7.0e-05   7.1e-06   1.9e-06         0         0         0         0         0   2.5e-04
+  foam or |  4.0e-05   2.9e-05         0         0         0         0         0         0         0         0   3.7e-05
+ standard |  8.0e-05   5.5e-05   1.4e-04         0         0         0         0         0         0         0   7.6e-05
+          | 
+    Total |        1         1         1         1         1         1         1         1         1         1         1
+------------------------------------------------------------------------------------------------------------------------
+  Key:  column proportions
+
+  Pearson:
+    Uncorrected   chi2(117)       =  1.74e+04
+    Design-based  F(26.26,  7.5e+05)=   46.5401   P = 0.0000
+
+. 
+. *wealth index
+
+. 
+. svy: tab v312 v190, col
+(running tabulate on estimation sample)
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+
+----------------------------------------------------------------
+current   |
+contracep |
+tive      |                     wealth index                    
+method    | poorest   poorer   middle   richer  richest    Total
+----------+-----------------------------------------------------
+ not usin |   .5938     .495    .4539    .4383    .4197    .4775
+     pill |   .0412    .0546    .0389    .0323    .0244    .0381
+      iud |   .0051    .0085    .0098    .0174    .0304    .0145
+ injectio |   .0015    .0015    .0014    .0019    .0023    .0017
+ diaphrag | 1.1e-05        0        0        0        0  2.1e-06
+   condom |   .0172    .0293    .0406    .0597    .1156    .0533
+ female s |   .2846    .3495    .4002    .3958    .3454    .3569
+ male ste |   .0022    .0027    .0023    .0026    .0031    .0026
+ rhythm/p |    .036    .0354    .0306    .0298     .034    .0331
+ withdraw |   .0173    .0222    .0214    .0208    .0241    .0212
+ lactatio |   .0011  9.9e-04  5.5e-04  7.8e-04  3.9e-04  7.5e-04
+ female c | 1.0e-05  1.9e-04  2.4e-04  4.4e-04  3.3e-04  2.5e-04
+  foam or |       0        0        0  1.7e-05  1.6e-04  3.7e-05
+ standard | 6.1e-05  7.1e-05  8.5e-05  9.0e-05  7.2e-05  7.6e-05
+          | 
+    Total |       1        1        1        1        1        1
+----------------------------------------------------------------
+  Key:  column proportions
+
+  Pearson:
+    Uncorrected   chi2(52)        =  2.33e+04
+    Design-based  F(22.09,  6.3e+05)=  132.3921   P = 0.0000
+
+. 
+. *highest educational level 
+
+. 
+. svy: tab v312 v106, col
+(running tabulate on estimation sample)
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+
+------------------------------------------------------------
+current   |
+contracep |
+tive      |            highest educational level            
+method    | no educa   primary  secondar    higher     Total
+----------+-------------------------------------------------
+ not usin |     .472     .4326     .4818     .5427     .4775
+     pill |    .0242     .0486     .0479     .0285     .0381
+      iud |    .0056     .0098     .0187     .0332     .0145
+ injectio |    .0014     .0015     .0017     .0031     .0017
+ diaphrag |  6.3e-06         0         0         0   2.1e-06
+   condom |    .0235     .0318     .0641     .1391     .0533
+ female s |    .4234     .4208     .3226     .1851     .3569
+ male ste |    .0027     .0028     .0025     .0023     .0026
+ rhythm/p |    .0329     .0311     .0329     .0373     .0331
+ withdraw |    .0138     .0202     .0263     .0267     .0212
+ lactatio |  5.1e-04   6.9e-04   9.6e-04   7.1e-04   7.5e-04
+ female c |  3.7e-05   1.6e-04   3.0e-04   8.8e-04   2.5e-04
+  foam or |        0         0   2.0e-05   2.8e-04   3.7e-05
+ standard |  4.2e-05   2.8e-05   1.2e-04   7.0e-05   7.6e-05
+          | 
+    Total |        1         1         1         1         1
+------------------------------------------------------------
+  Key:  column proportions
+
+  Pearson:
+    Uncorrected   chi2(39)        =  2.63e+04
+    Design-based  F(23.29,  6.6e+05)=  214.7271   P = 0.0000
+
+. 
+. *type of place of residence Urban/Rural
+
+. 
+. svy: tab v312 v025, col
+(running tabulate on estimation sample)
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+
+-------------------------------------
+current   |
+contracep |
+tive      |type of place of residence
+method    |   urban    rural    Total
+----------+--------------------------
+ not usin |   .4424    .4952    .4775
+     pill |    .033    .0407    .0381
+      iud |   .0223    .0105    .0145
+ injectio |   .0021    .0015    .0017
+ diaphrag |       0  3.2e-06  2.1e-06
+   condom |   .0853    .0371    .0533
+ female s |   .3561    .3573    .3569
+ male ste |   .0024    .0027    .0026
+ rhythm/p |    .033    .0331    .0331
+ withdraw |   .0224    .0206    .0212
+ lactatio | 5.5e-04  8.5e-04  7.5e-04
+ female c | 3.1e-04  2.2e-04  2.5e-04
+  foam or | 1.1e-04        0  3.7e-05
+ standard | 6.3e-05  8.3e-05  7.6e-05
+          | 
+    Total |       1        1        1
+-------------------------------------
+  Key:  column proportions
+
+  Pearson:
+    Uncorrected   chi2(13)        = 7341.8978
+    Design-based  F(9.16,  2.6e+05)=  112.1495    P = 0.0000
+
+. 
+. *Question 3 : cross tabulation of created nominal variable with same variables as before*
+
+. 
+. *religion
+
+. 
+. svy: tab contra_use v130, col
+(running tabulate on estimation sample)
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+
+------------------------------------------------------------------------------------------------------------------------
+contra_us |                                                   religion                                                  
+e         |    hindu    muslim  christia      sikh  buddhist      jain    jewish  parsi/zo  no relig     other     Total
+----------+-------------------------------------------------------------------------------------------------------------
+       NO |     .468     .5615     .5027      .283     .3407     .3896     .6974     .8138      .767     .5997     .4775
+      YES |     .532     .4385     .4973      .717     .6593     .6104     .3026     .1862      .233     .4003     .5225
+          | 
+    Total |        1         1         1         1         1         1         1         1         1         1         1
+------------------------------------------------------------------------------------------------------------------------
+  Key:  column proportions
+
+  Pearson:
+    Uncorrected   chi2(9)         = 4041.9679
+    Design-based  F(5.56,  1.6e+05)=  101.6813    P = 0.0000
+
+. 
+. *wealth index
+
+. 
+. svy: tab contra_use v190, col
+(running tabulate on estimation sample)
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+
+----------------------------------------------------------------
+contra_us |                     wealth index                    
+e         | poorest   poorer   middle   richer  richest    Total
+----------+-----------------------------------------------------
+       NO |   .5938     .495    .4539    .4383    .4197    .4775
+      YES |   .4062     .505    .5461    .5617    .5803    .5225
+          | 
+    Total |       1        1        1        1        1        1
+----------------------------------------------------------------
+  Key:  column proportions
+
+  Pearson:
+    Uncorrected   chi2(4)         = 7834.6048
+    Design-based  F(3.49, 99465.26)=  518.3884    P = 0.0000
+
+. 
+. *highest educational level 
+
+. 
+. svy: tab contra_use v106, col
+(running tabulate on estimation sample)
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+
+------------------------------------------------------------
+contra_us |            highest educational level            
+e         | no educa   primary  secondar    higher     Total
+----------+-------------------------------------------------
+       NO |     .472     .4326     .4818     .5427     .4775
+      YES |     .528     .5674     .5182     .4573     .5225
+          | 
+    Total |        1         1         1         1         1
+------------------------------------------------------------
+  Key:  column proportions
+
+  Pearson:
+    Uncorrected   chi2(3)         = 1570.9388
+    Design-based  F(2.77, 79124.61)=  145.8316    P = 0.0000
+
+. 
+. *type of place of residence Urban/Rural
+
+. 
+. svy: tab contra_use v025, col
+(running tabulate on estimation sample)
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+
+-------------------------------
+          |  type of place of  
+contra_us |      residence     
+e         | urban  rural  Total
+----------+--------------------
+       NO | .4424  .4952  .4775
+      YES | .5576  .5048  .5225
+          | 
+    Total |     1      1      1
+-------------------------------
+  Key:  column proportions
+
+  Pearson:
+    Uncorrected   chi2(1)         = 1333.0371
+    Design-based  F(1, 28517)     =  161.3837     P = 0.0000
+. gen religion=.
+(699686 missing values generated)
+
+. replace religion=0 if v130==1
+(519281 real changes made)
+
+. 
+. replace religion=1 if v130==2
+(94591 real changes made)
+
+. 
+. replace religion=2 if v130==3
+(52113 real changes made)
+
+. 
+. replace religion=3 if v130==4
+(15300 real changes made)
+
+. 
+. replace religion=4 if v130==5
+(8981 real changes made)
+
+. 
+. replace religion=5 if v130==6
+(1028 real changes made)
+
+. 
+. replace religion=6 if v130==7
+(7 real changes made)
+
+. 
+. replace religion=7 if v130==8
+(7 real changes made)
+
+. 
+. replace religion=8 if v130==9
+(399 real changes made)
+
+. gen urban=.
+(699686 missing values generated)
+
+. replace urban=0 if v025==2
+(494951 real changes made)
+
+. replace urban=1 if v025==1
+(204735 real changes made)
+
+. gen wealth=.
+(699686 missing values generated)
+
+. replace wealth=0 if v190==1
+(133249 real changes made)
+
+. 
+. replace wealth=1 if v190==2
+(149466 real changes made)
+
+. 
+. replace wealth=2 if v190==3
+(147168 real changes made)
+
+. 
+. replace wealth=3 if v190==4
+(138502 real changes made)
+
+. 
+. replace wealth=4 if v190==5
+(131301 real changes made)
+
+. pwcorr contra_use religion ,obs sig
+
+             | contra~e religion
+-------------+------------------
+  contra_use |   1.0000 
+             |
+             |   5.3e+05
+             |
+    religion |  -0.0476   1.0000 
+             |   0.0000
+             |   5.3e+05   6.9e+05
+             |
+
+. svy: regress contra_use religion
+(running regress on estimation sample)
+
+Survey: Linear regression
+
+Number of strata   =         1                  Number of obs      =    528683
+Number of PSUs     =     28492                  Population size    = 5433721.5
+                                                Design df          =     28491
+                                                F(   1,  28491)    =      5.04
+                                                Prob > F           =    0.0247
+                                                R-squared          =    0.0000
+
+------------------------------------------------------------------------------
+             |             Linearized
+  contra_use |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    religion |   .0046578   .0020743     2.25   0.025     .0005921    .0087234
+       _cons |   .5218369   .0020516   254.35   0.000     .5178156    .5258582
+------------------------------------------------------------------------------
+
+. svy: regress contra_use i.religion
+(running regress on estimation sample)
+
+Survey: Linear regression
+
+Number of strata   =         1                  Number of obs      =    528683
+Number of PSUs     =     28492                  Population size    = 5433721.5
+                                                Design df          =     28491
+                                                F(   8,  28484)    =    160.40
+                                                Prob > F           =    0.0000
+                                                R-squared          =    0.0073
+
+------------------------------------------------------------------------------
+             |             Linearized
+  contra_use |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    religion |
+          1  |  -.0934687   .0051331   -18.21   0.000    -.1035299   -.0834076
+          2  |  -.0346869   .0089181    -3.89   0.000    -.0521669   -.0172069
+          3  |   .1849985   .0067944    27.23   0.000     .1716811    .1983158
+          4  |   .1273295   .0139087     9.15   0.000     .1000678    .1545913
+          5  |   .0784536   .0337088     2.33   0.020     .0123827    .1445245
+          6  |  -.2293467    .217099    -1.06   0.291     -.654871    .1961776
+          7  |  -.3457682   .2007248    -1.72   0.085    -.7391983     .047662
+          8  |   -.299038   .0675893    -4.42   0.000    -.4315162   -.1665597
+             |
+       _cons |   .5319962    .002082   255.52   0.000     .5279154    .5360769
+------------------------------------------------------------------------------
+
+. pwcorr contra_use wealth ,obs sig
+
+             | contra~e   wealth
+-------------+------------------
+  contra_use |   1.0000 
+             |
+             |   5.3e+05
+             |
+      wealth |   0.1070   1.0000 
+             |   0.0000
+             |   5.3e+05   7.0e+05
+             |
+
+. svy: regress contra_use wealth
+(running regress on estimation sample)
+
+Survey: Linear regression
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+                                                F(   1,  28517)    =   1149.77
+                                                Prob > F           =    0.0000
+                                                R-squared          =    0.0124
+
+------------------------------------------------------------------------------
+             |             Linearized
+  contra_use |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      wealth |   .0398895   .0011764    33.91   0.000     .0375837    .0421953
+       _cons |   .4407347   .0031353   140.57   0.000     .4345893    .4468801
+------------------------------------------------------------------------------
+
+. svy: regress contra_use i.wealth
+(running regress on estimation sample)
+
+Survey: Linear regression
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+                                                F(   4,  28514)    =    418.48
+                                                Prob > F           =    0.0000
+                                                R-squared          =    0.0147
+
+------------------------------------------------------------------------------
+             |             Linearized
+  contra_use |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      wealth |
+          1  |   .0988442   .0035876    27.55   0.000     .0918123     .105876
+          2  |   .1399226   .0040454    34.59   0.000     .1319933    .1478518
+          3  |   .1555114   .0045172    34.43   0.000     .1466575    .1643653
+          4  |   .1741495   .0049703    35.04   0.000     .1644074    .1838915
+             |
+       _cons |   .4061774    .003493   116.28   0.000     .3993311    .4130238
+------------------------------------------------------------------------------
+
+. pwcorr contra_use urban ,obs sig
+
+             | contra~e    urban
+-------------+------------------
+  contra_use |   1.0000 
+             |
+             |   5.3e+05
+             |
+       urban |   0.0383   1.0000 
+             |   0.0000
+             |   5.3e+05   7.0e+05
+             |
+
+. svy: regress contra_use urban
+(running regress on estimation sample)
+
+Survey: Linear regression
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+                                                F(   1,  28517)    =    162.53
+                                                Prob > F           =    0.0000
+                                                R-squared          =    0.0025
+
+------------------------------------------------------------------------------
+             |             Linearized
+  contra_use |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       urban |   .0528071   .0041422    12.75   0.000     .0446883    .0609259
+       _cons |   .5047694   .0023808   212.02   0.000     .5001029    .5094359
+------------------------------------------------------------------------------
+
+. pwcorr contra_use  v106,obs sig
+
+             | contra~e     v106
+-------------+------------------
+  contra_use |   1.0000 
+             |
+             |   5.3e+05
+             |
+        v106 |  -0.0383   1.0000 
+             |   0.0000
+             |   5.3e+05   7.0e+05
+             |
+
+. svy: regress contra_use v106
+(running regress on estimation sample)
+
+Survey: Linear regression
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+                                                F(   1,  28517)    =    120.99
+                                                Prob > F           =    0.0000
+                                                R-squared          =    0.0010
+
+------------------------------------------------------------------------------
+             |             Linearized
+  contra_use |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        v106 |  -.0155308   .0014119   -11.00   0.000    -.0182983   -.0127634
+       _cons |   .5424335   .0027752   195.45   0.000     .5369939    .5478731
+------------------------------------------------------------------------------
+
+. svy: regress contra_use i.v106
+(running regress on estimation sample)
+
+Survey: Linear regression
+
+Number of strata   =         1                  Number of obs      =    534746
+Number of PSUs     =     28518                  Population size    = 5460608.5
+                                                Design df          =     28517
+                                                F(   3,  28515)    =    140.60
+                                                Prob > F           =    0.0000
+                                                R-squared          =    0.0029
+
+------------------------------------------------------------------------------
+             |             Linearized
+  contra_use |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        v106 |
+    primary  |   .0393917   .0034422    11.44   0.000     .0326447    .0461386
+  secondary  |  -.0098847   .0031193    -3.17   0.002    -.0159986   -.0037708
+     higher  |  -.0707888   .0053404   -13.26   0.000    -.0812563   -.0603214
+             |
+       _cons |   .5280411   .0028007   188.54   0.000     .5225515    .5335307
+------------------------------------------------------------------------------
+
+. pwcorr contra_use religion wealth urban v106,obs sig
+
+             | contra~e religion   wealth    urban     v106
+-------------+---------------------------------------------
+  contra_use |   1.0000 
+             |
+             |   5.3e+05
+             |
+    religion |  -0.0476   1.0000 
+             |   0.0000
+             |   5.3e+05   6.9e+05
+             |
+      wealth |   0.1070   0.1089   1.0000 
+             |   0.0000   0.0000
+             |   5.3e+05   6.9e+05   7.0e+05
+             |
+       urban |   0.0383   0.0415   0.4812   1.0000 
+             |   0.0000   0.0000   0.0000
+             |   5.3e+05   6.9e+05   7.0e+05   7.0e+05
+             |
+        v106 |  -0.0383   0.0464   0.4644   0.2322   1.0000 
+             |   0.0000   0.0000   0.0000   0.0000
+             |   5.3e+05   6.9e+05   7.0e+05   7.0e+05   7.0e+05
+             |
+
+. svy : reg contra_use religion wealth urban v106
+(running regress on estimation sample)
+
+Survey: Linear regression
+
+Number of strata   =         1                  Number of obs      =    528683
+Number of PSUs     =     28492                  Population size    = 5433721.5
+                                                Design df          =     28491
+                                                F(   4,  28488)    =    763.21
+                                                Prob > F           =    0.0000
+                                                R-squared          =    0.0231
+
+------------------------------------------------------------------------------
+             |             Linearized
+  contra_use |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    religion |    -.00534   .0020588    -2.59   0.009    -.0093754   -.0013046
+      wealth |    .063567   .0013067    48.65   0.000     .0610058    .0661281
+       urban |  -.0097091   .0043394    -2.24   0.025    -.0182145   -.0012037
+        v106 |  -.0582158   .0014196   -41.01   0.000    -.0609983   -.0554333
+       _cons |    .471966   .0033015   142.96   0.000      .465495    .4784371
+------------------------------------------------------------------------------
+
+. svy : reg contra_use i.religion i.wealth i.urban i.v106
+(running regress on estimation sample)
+
+Survey: Linear regression
+
+Number of strata   =         1                  Number of obs      =    528683
+Number of PSUs     =     28492                  Population size    = 5433721.5
+                                                Design df          =     28491
+                                                F(  16,  28476)    =    315.59
+                                                Prob > F           =    0.0000
+                                                R-squared          =    0.0349
+
+------------------------------------------------------------------------------
+             |             Linearized
+  contra_use |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    religion |
+          1  |  -.1124178   .0052565   -21.39   0.000    -.1227208   -.1021149
+          2  |  -.0382763   .0086081    -4.45   0.000    -.0551486    -.021404
+          3  |   .1207465   .0068365    17.66   0.000     .1073468    .1341463
+          4  |   .1166693   .0140934     8.28   0.000     .0890456     .144293
+          5  |    .059261   .0326903     1.81   0.070    -.0048136    .1233356
+          6  |  -.2973817   .2278157    -1.31   0.192    -.7439112    .1491478
+          7  |  -.4194228   .2306683    -1.82   0.069    -.8715436    .0326979
+          8  |    -.29158   .0707946    -4.12   0.000    -.4303408   -.1528193
+             |
+      wealth |
+          1  |   .1153062   .0036492    31.60   0.000     .1081535    .1224589
+          2  |   .1701952   .0042473    40.07   0.000     .1618703    .1785201
+          3  |   .2074702   .0047377    43.79   0.000     .1981841    .2167563
+          4  |   .2618179   .0055151    47.47   0.000      .251008    .2726279
+             |
+     1.urban |   .0112805   .0042634     2.65   0.008      .002924    .0196371
+             |
+        v106 |
+    primary  |   .0006887   .0033685     0.20   0.838    -.0059137    .0072912
+  secondary  |  -.0964424   .0030995   -31.12   0.000    -.1025177   -.0903672
+     higher  |   -.218097   .0052262   -41.73   0.000    -.2283406   -.2078534
+             |
+       _cons |   .4393597   .0036795   119.41   0.000     .4321478    .4465717
+------------------------------------------------------------------------------
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\vkasa\Desktop\f2.log
+  log type:  text
+ closed on:  24 Oct 2018, 22:49:20
+----------------------------------------------------------------------------------------------------------------------------------
