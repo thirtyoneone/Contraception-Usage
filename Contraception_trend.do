@@ -13,7 +13,7 @@ label value contra_use i_contra_use
 tab contra_use
 tab v312
 *Adding weights to the clusters*
-gen wt = v005/100000
+gen wt = v005/1000000
 svyset v001 [pweight=wt]
 *Question 2 : cross tabulation of main variable with other variables*
 *religion
